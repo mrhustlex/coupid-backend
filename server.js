@@ -29,9 +29,6 @@ const jwtCheck = auth({
   tokenSigningAlg: 'RS256'
 });
 
-// enforce on all endpoints
-app.use(jwtCheck);
-
 
 
 app.get('/', (req, res) => {
@@ -45,8 +42,9 @@ app.get('/home', (req, res) => {
 // Middleware
 app.use(bodyParser.json());
 
-// Define middleware to handle authentication
-// app.use(auth(authConfig));
+
+// enforce on all endpoints
+app.use(jwtCheck);
 
 // User Routes
 app.use('/api/users', userRoutes);
@@ -55,6 +53,6 @@ app.use('/api/coupon', couponRoutes);
 
 
 // Start the server
-app.listen(3000, () => {
-  console.log('Server is listening on port 3000');
+app.listen(80, () => {
+  console.log('Server is listening on port 80');
 });
