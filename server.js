@@ -53,6 +53,6 @@ app.use('/api/coupon', couponRoutes);
 
 
 // Start the server
-app.listen(80, () => {
-  console.log('Server is listening on port 80');
+app.listen(process.env.PORT, () => {
+  console.log('Server is listening on port'+process.env.PORT);
 });
