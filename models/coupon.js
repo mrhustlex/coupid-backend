@@ -8,23 +8,30 @@ Coupon.init({
   code: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true
+    unique: {
+      msg: "This coupon code already exists"
+    }
   },
   discount: {
     type: DataTypes.FLOAT,
     allowNull: false,
     validate: {
-      min: 0,
-      max: 100
-    }
+      min: {
+        args: [0],
+        msg: 'Discount must be greater than or equal to 0'
+      },
+      max: {
+        args: [100],
+        msg: 'Discount must be less than or equal to 100'
+      }
   },
   expirationDate: {
     type: DataTypes.DATE,
-    allowNull: false,
+    allowNull: true,
     defaultValue: DataTypes.NOW
   },
   status: {
-    type: DataTypes.ENUM('active', 'archived'),
+    type: DataTypes.ENUM('active', 'archived', 'deleted'),
     allowNull: false,
     defaultValue: 'active'
   }
