@@ -4,32 +4,17 @@ const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoute');
 const couponRoutes = require('./routes/couponRoute');
 const dotenv = require('dotenv').config();
-// const { auth } = require('express-openid-connect');
-const { auth } = require('express-oauth2-jwt-bearer');
+const { jwtCheck, checkScopes } = require('./config/auth');
 const axios = require('axios');
-// const { requiresAuth } = require('express-openid-connect');
 
-// const authConfig = {
+// const jwtCheck = auth({
 //   audience: 'localhost:3000/couponapp',
-//   authRequired: true,
-//   auth0Logout: true,
-//   secret: process.env.AUTH0_CLIENT_SECRET,
-//   // baseURL: `http://${process.env.POD_IP}:80/callback`,
-//   baseURL: process.env.AUTH0_CALLBACK_URL,
-//   clientID: process.env.AUTH0_CLIENT_ID,
-//   issuerBaseURL: process.env.AUTH0_DOMAIN,
-//   algorithms: ['RS256'],
-// };
+//   issuerBaseURL: 'https://dev-32lxqsmlyr2lle1a.us.auth0.com/',
+//   // tokenSigningAlg: 'RS256'
+// });
 
-// // enforce on all endpoints
-// app.use(auth(authConfig));
-const jwtCheck = auth({
-  audience: 'localhost:3000/couponapp',
-  issuerBaseURL: 'https://dev-32lxqsmlyr2lle1a.us.auth0.com/',
-  tokenSigningAlg: 'RS256'
-});
-
-
+// Middleware
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.send('Hello World!')
@@ -39,20 +24,34 @@ app.get('/home', (req, res) => {
   res.send('Home!')
 })
 
-// Middleware
-app.use(bodyParser.json());
-
-
-// enforce on all endpoints
-app.use(jwtCheck);
-
 // User Routes
 app.use('/api/users', userRoutes);
 app.use('/api/coupon', couponRoutes);
+// This route doesn't need authentication
+app.get('/api/public', function(req, res) {
+  res.json({
+    message: 'Hello from a public endpoint! You don\'t need to be authenticated to see this.'
+  });
+});
+
+// This route needs authentication
+app.get('/api/private', jwtCheck, function(req, res) {
+  res.json({
+    message: 'Hello from a private endpoint! You need to be authenticated to see this.'
+  });
+});
 
 
+app.get('/api/private-scoped', jwtCheck, checkScopes, function(req, res) {
+  res.json({
+    message: 'Hello from a private endpoint! You need to be authenticated and have a scope of read:messages to see this.'
+  });
+});
 
 // Start the server
 app.listen(process.env.PORT, () => {
   console.log('Server is listening on port'+process.env.PORT);
 });
+
+
+

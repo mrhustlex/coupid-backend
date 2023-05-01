@@ -1,18 +1,38 @@
 const sequelize = require('./config/database');
 const User = require('./models/user');
 const Coupon = require('./models/coupon');
+const faker = require('faker');
 
 async function initializeDatabase() {
   try {
     // Synchronize the models with the database
     await sequelize.sync({ force: true });
 
-    // Create initial data
-    const user = await User.create({ name: 'John Doe', email: 'johndoe@example.com', password: 'password123' });
-    console.log('User created successfully:', user.toJSON());
+    // Create 100 fake users
+    const users = [];
+    for (let i = 0; i < 100; i++) {
+      const user = {
+        name: faker.name.findName(),
+        email: faker.internet.email(),
+        password: faker.internet.password(8)
+      };
+      users.push(user);
+    }
+    await User.bulkCreate(users);
+    console.log('Users created successfully');
 
-    const coupon = await Coupon.create({ code: 'SALE50', discount: 50, expirationDate: new Date('2023-05-01') });
-    console.log('Coupon created successfully:', coupon.toJSON());
+    // Create 100 fake coupons
+    const coupons = [];
+    for (let i = 0; i < 100; i++) {
+      const coupon = {
+        code: faker.random.alphaNumeric(8).toUpperCase(),
+        discount: faker.random.number({ min: 10, max: 90 }),
+        expirationDate: faker.date.future()
+      };
+      coupons.push(coupon);
+    }
+    await Coupon.bulkCreate(coupons);
+    console.log('Coupons created successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
   }
