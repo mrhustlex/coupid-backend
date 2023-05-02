@@ -18,11 +18,10 @@ const {
 // Define routes for coupons
 router.post('/create', jwtCheck, createCoupon);
 router.get('/list', listCoupon); // removed authMiddleware
-router.post('/:code/use', useCoupon);
-router.get('/:code', showCouponDetail);
-router.post('/:code/archive', archiveCoupon);
-router.put('/:code', modifyCoupon);
-router.delete('/:code', deleteCoupon);
-router.get('/:code/get', getCoupon);
+router.post('/use', jwtCheck, useCoupon);
+router.get('/details/:code', showCouponDetail);
+router.post('/archive', archiveCoupon);
+router.put('/modify', modifyCoupon);
+router.delete('/delete', deleteCoupon);
 
 module.exports = router;

@@ -51,11 +51,11 @@ const listCoupon = async (req, res) => {
 
 // Define a function to use/scan a coupon
 const useCoupon = async (req, res) => {
-  const { code } = req.params;
-
+  const { code } = req.body;
+  console.log("COde: "+code);
+  console.log(req.params);
   try {
     const coupon = await Coupon.findOne({ where: { code } });
-
     if (!coupon) {
       return res.status(404).json({ error: 'Coupon not found' });
     }
@@ -64,7 +64,7 @@ const useCoupon = async (req, res) => {
       return res.status(400).json({ error: 'Coupon has already expired' });
     }
 
-    coupon.usedBy.push(req.user.sub); // Assuming you're using Auth0 and have a `sub` claim in the JWT
+    coupon.usedBy.push(req.auth.payload.sub); // Assuming you're using Auth0 and have a `sub` claim in the JWT
     await coupon.save();
 
     res.json(coupon);
@@ -76,7 +76,7 @@ const useCoupon = async (req, res) => {
 // Define a function to show the details of a coupon
 const showCouponDetail = async (req, res) => {
   const { code } = req.params;
-
+  console.log(req.params);
   try {
     const coupon = await Coupon.findOne({ where: { code } });
 
@@ -92,14 +92,14 @@ const showCouponDetail = async (req, res) => {
 
 // Define a function to archive a listed coupon
 const archiveCoupon = async (req, res) => {
-  const { code } = req.params;
-
+  const { code } = req.body;
+  console.log(code);
   try {
     const [numUpdated, updatedCoupon] = await Coupon.update(
-      { isArchived: true },
+      { status: 'archived' },
       { where: { code }, returning: true }
     );
-
+      console.log(updatedCoupon, numUpdated);
     if (numUpdated === 0) {
       return res.status(404).json({ error: 'Coupon not found' });
     }
@@ -112,8 +112,8 @@ const archiveCoupon = async (req, res) => {
 
 // Define a function to modify a listed coupon
 const modifyCoupon = async (req, res) => {
-  const { code } = req.params;
-  const { discount } = req.body;
+  // const {  } = req.params;
+  const { code, discount } = req.body;
 
   try {
     const [numUpdated, updatedCoupon] = await Coupon.update(
@@ -133,7 +133,7 @@ const modifyCoupon = async (req, res) => {
 
 // Define a function to delete a listed coupon
 const deleteCoupon = async (req, res) => {
-  const { code } = req.params;
+  const { code } = req.body;
 
   try {
     const numDeleted = await Coupon.destroy({ where: { code } });
@@ -148,23 +148,6 @@ const deleteCoupon = async (req, res) => {
   }
 };
 
-// Define a function to get a coupon by code
-const getCoupon = async (req, res) => {
-  const { code } = req.params;
-
-  try {
-    const coupon = await Coupon.findOne({ where: { code } });
-
-    if (!coupon) {
-      return res.status(404).json({ error: 'Coupon not found' });
-    }
-
-    res.json(coupon);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
 module.exports = {
   createCoupon,
   listCoupon,
@@ -172,6 +155,5 @@ module.exports = {
   showCouponDetail,
   archiveCoupon,
   modifyCoupon,
-  deleteCoupon,
-  getCoupon
+  deleteCoupon
 };

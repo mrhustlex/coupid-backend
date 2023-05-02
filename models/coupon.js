@@ -24,6 +24,7 @@ Coupon.init({
         args: [100],
         msg: 'Discount must be less than or equal to 100'
       }
+    }
   },
   expirationDate: {
     type: DataTypes.DATE,
@@ -34,8 +35,13 @@ Coupon.init({
     type: DataTypes.ENUM('active', 'archived', 'deleted'),
     allowNull: false,
     defaultValue: 'active'
+  },
+  usedBy: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: false,
+    defaultValue: []
   }
-}, {
+},{
   sequelize,
   modelName: 'coupon',
   timestamps: true
