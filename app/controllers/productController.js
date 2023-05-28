@@ -92,7 +92,7 @@ async function getProductOfferById(req, res) {
   }
 }
 
-asyncfunction updateProductOffer(req, res) {
+async function updateProductOffer(req, res) {
   try {
     const productOffer = await ProductOffer.findByPk(req.params.id);
     if (!productOffer) {
