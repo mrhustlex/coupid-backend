@@ -148,6 +148,22 @@ const deleteCoupon = async (req, res) => {
   }
 };
 
+// Define a function to list the hot deals coupons for top 8 discount
+const listHotDealCoupon = async (req, res) => {
+   try {
+    const coupons = await Coupon.findAll({
+      order: [['discount', 'DESC']],
+      where: { hot_deal: 1 },
+      limit: 8
+    });
+
+    res.json(coupons);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+
+}
+
 module.exports = {
   createCoupon,
   listCoupon,
@@ -155,5 +171,6 @@ module.exports = {
   showCouponDetail,
   archiveCoupon,
   modifyCoupon,
-  deleteCoupon
+  deleteCoupon,
+  listHotDealCoupon
 };

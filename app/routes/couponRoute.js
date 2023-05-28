@@ -12,12 +12,13 @@ const {
   archiveCoupon,
   modifyCoupon,
   deleteCoupon,
-  getCoupon
+  listHotDealCoupon
 } = require('../controllers/couponController');
 
 // Define routes for coupons
 router.post('/create', jwtCheck, createCoupon);
 router.get('/list', listCoupon); // removed authMiddleware
+router.get('/hotdeals', listHotDealCoupon);
 router.post('/use', jwtCheck, useCoupon);
 router.get('/details/:code', showCouponDetail);
 router.post('/archive', archiveCoupon);

@@ -5,6 +5,15 @@ const sequelize = require('../config/database');
 class Coupon extends Model {}
 
 Coupon.init({
+  title: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  hot_deal: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
   code: {
     type: DataTypes.STRING,
     allowNull: false,

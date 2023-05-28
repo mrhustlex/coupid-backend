@@ -6,7 +6,10 @@ const couponRoutes = require('./routes/couponRoute');
 const dotenv = require('dotenv').config();
 const { jwtCheck, checkScopes } = require('./config/auth');
 const axios = require('axios');
+const cors = require('cors');
 
+// not set the restriction to api cors yet
+app.use(cors());
 // const jwtCheck = auth({
 //   audience: 'localhost:3000/couponapp',
 //   issuerBaseURL: 'https://dev-32lxqsmlyr2lle1a.us.auth0.com/',
