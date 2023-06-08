@@ -7,11 +7,11 @@ const faker = require('faker');
 async function initializeDatabase() {
   try {
     await sequelize.sync({ force: true });
-    // await createUsers(100);
-    // await createCoupons(1000);
+    await createUsers(100);
+    await createCoupons(1000);
     await createMerchants(10);
-    const productOffers = await ProductOffer.findAll();
-    console.log(productOffers);
+    // const productOffers = await ProductOffer.findAll();
+    // console.log(productOffers);
   } catch (error) {
     console.error('Error initializing database:', error);
   }
@@ -59,7 +59,7 @@ async function createMerchants(num) {
     try {
       // await Merchant.bulkCreate(merchants);
       const createdMerchant = await Merchant.create(merchant);
-      const createdProduct = await createProducts(faker.random.number({ min: 5, max: 10 }), createdMerchant.id);
+      const createdProduct = await createProducts(faker.datatype.number({ min: 10, max: 50 }), createdMerchant.id);
       console.log('Merchants created successfully');
     } catch (err) {
       console.error('Error creating merchants:', err);
@@ -74,16 +74,16 @@ async function createProducts(num, merchantId) {
       const product = {
         name: faker.commerce.productName(),
         description: faker.lorem.sentence(),
-        price: faker.random.number({ min: 5, max: 100 }),
-        stock: faker.random.number({ min: 10, max: 100 }),
+        price: faker.datatype.number({ min: 5, max: 100 }),
+        stock: faker.datatype.number({ min: 10, max: 100 }),
         category: faker.commerce.department(),
         features: [faker.lorem.word(), faker.lorem.word(), faker.lorem.word()],
-        deliveryTime: faker.random.number({ min: 1, max: 14 }),
+        deliveryTime: faker.datatype.number({ min: 1, max: 14 }),
         status: 'available',
         merchantId: merchantId
       };
       const createdProduct = await Product.create(product);
-      await createProductOfferings(faker.random.number({ min: 3, max: 5 }), createdProduct.id);
+      await createProductOfferings(faker.datatype.number({ min: 3, max: 5 }), createdProduct.id);
     }
     console.log(`Created ${num} products successfully for merchant with ID ${merchantId}`);
   } catch (err) {
@@ -97,8 +97,8 @@ async function createProductOfferings(num, productId) {
       const productOffer = {
         name: faker.commerce.productName(),
         description: faker.lorem.sentence(),
-        price: faker.random.number({ min: 1, max: 50 }),
-        stock: faker.random.number({ min: 5, max: 20 }),
+        price: faker.datatype.number({ min: 1, max: 50 }),
+        stock: faker.datatype.number({ min: 5, max: 20 }),
         startDate: faker.date.future(),
         endDate: faker.date.future(),
         productId: productId
@@ -108,7 +108,6 @@ async function createProductOfferings(num, productId) {
       // console.log(createdProductOffer);
     }
     console.log(`Created ${num} product offerings successfully for product with ID ${productId}`);
-    return productOfferings;
   } catch (err) {
     console.error(`Error creating product offerings for product with ID ${productId}:`, err);
   }

@@ -1,64 +1,4 @@
-const { Merchant, ProductOffer, Product } = require('../models/product');
-
-// Merchant controller
-async function createMerchant(req, res) {
-  try {
-    const merchant = await Merchant.create(req.body);
-    res.status(201).json(merchant);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-}
-
-async function getAllMerchants(req, res) {
-  try {
-    const merchants = await Merchant.findAll();
-    res.json(merchants);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}
-
-async function getMerchantById(req, res) {
-  try {
-    const merchant = await Merchant.findByPk(req.params.id);
-    if (!merchant) {
-      res.status(404).json({ message: 'Merchant not found' });
-    } else {
-      res.json(merchant);
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}
-
-async function updateMerchant(req, res) {
-  try {
-    const merchant = await Merchant.findByPk(req.params.id);
-    if (!merchant) {
-      res.status(404).json({ message: 'Merchant not found' });
-    } else {
-      await merchant.update(req.body);
-      res.json(merchant);
-    }
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-}
-
-async function deleteMerchant(req, res) {
-  try {
-    const merchant = await Merchant.findByPk(req.params.id);
-    if (!merchant) {
-      res.status(404).json({ message: 'Merchant not found' });
-    } else {
-      await merchant.destroy();
-      res.status(204).json();
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}
+const {ProductOffer, Product, Merchant } = require('../models/product');
 
 // ProductOffer controller
 async function createProductOffer(req, res) {
@@ -129,14 +69,58 @@ async function createProduct(req, res) {
     res.status(400).json({ message: error.message });
   }
 }
-
 async function getAllProducts(req, res) {
+    try {
+      const { page = 1, limit = 12, category = null, status = null } = req.query;
+      const offset = (page - 1) * limit;
+      const where = {};
+      if (category) {
+        where.category = category;
+      }
+      if (status) {
+        where.status = status;
+      }
+      const products = await Product.findAndCountAll({ limit, offset, where });
+      const totalPages = Math.ceil(products.count / limit);
+      const hasNextPage = page < totalPages;
+      const hasPrevPage = page > 1;
+      res.json({ products: products.rows, totalPages, hasNextPage, hasPrevPage });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+   }
+}
+
+async function getHotCategories(req, res) {
   try {
-    const products = await Product.findAll({ include: [ProductOffer, Merchant] });
+    const categories = await Product.findAll({
+      attributes: ['category', [sequelize.fn('count', sequelize.col('id')), 'count']],
+      group: ['category'],
+      order: [[sequelize.literal('count'), 'DESC']],
+      limit: 5,
+    });
+
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}
+
+async function getHotProducts(req, res) {
+  try {
+    const { category = null, status = null } = req.query;
+    const where = {};
+    if (category) {
+      where.category = category;
+    }
+    if (status) {
+      where.status = status;
+    }
+    const products = await Product.findAll({ where, order: [['stock', 'DESC']], limit: 8 });
     res.json(products);
   } catch (error) {
     res.status(500).json({ message: error.message });
- }
+  }
+}
 
 async function getProductById(req, res) {
   try {
@@ -180,19 +164,16 @@ async function deleteProduct(req, res) {
 }
 
 module.exports = {
-  createMerchant,
-  getAllMerchants,
-  getMerchantById,
-  updateMerchant,
-  deleteMerchant,
-  createProductOffer,
-  getAllProductOffers,
-  getProductOfferById,
-  updateProductOffer,
-  deleteProductOffer,
-  createProduct,
-  getAllProducts,
-  getProductById,
-  updateProduct,
-  deleteProduct
-};
+    createProductOffer,
+    getAllProductOffers,
+    getProductOfferById,
+    updateProductOffer,
+    deleteProductOffer,
+    createProduct,
+    getAllProducts,
+    getHotProducts,
+    getProductById,
+    getHotCategories,
+    updateProduct,
+    deleteProduct
+  };

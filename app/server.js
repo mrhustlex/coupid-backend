@@ -3,6 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoute');
 const couponRoutes = require('./routes/couponRoute');
+const productRoutes = require('./routes/productRoute');
+const merchantRoutes = require('./routes/merchantRoute');
 const dotenv = require('dotenv').config();
 const { jwtCheck, checkScopes } = require('./config/auth');
 const axios = require('axios');
@@ -27,9 +29,10 @@ app.get('/home', (req, res) => {
   res.send('Home!')
 })
 
-// User Routes
 app.use('/api/users', userRoutes);
 app.use('/api/coupon', couponRoutes);
+app.use('/api/product', productRoutes);
+app.use('/api/merchant', merchantRoutes);
 // This route doesn't need authentication
 app.get('/api/public', function(req, res) {
   res.json({
